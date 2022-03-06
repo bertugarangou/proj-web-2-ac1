@@ -1,3 +1,4 @@
+# AC1 Proj Web 2 corrent al Docker Local Enviroment 2 de l'assignatura
 # Local Environment
 > Using Docker for our local environment
 
@@ -18,6 +19,3 @@ pw_local_env-db      docker-entrypoint.sh mysqld      Up      0.0.0.0:3330->3306
 pw_local_env-nginx   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8030->80/tcp             
 pw_local_env-php     docker-php-entrypoint php-fpm    Up      9000/tcp, 0.0.0.0:9030->9001/tcp
 ```
-
-AC1 Proj Web 2 corrent al Docker Local Enviroment 2 de l'assignatura
-
