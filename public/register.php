@@ -22,14 +22,14 @@ ob_start();
         <p>Please register here</p>
 
         <form method="POST">
-            <label for="email"><b>email</b></label>
+            <label for="email"><b>Email: </b></label>
             <input id="email" type="text" placeholder="Enter Email" name="email" required>
             <br>
             <br>
-            <label for="password"><b>password</b></label>
+            <label for="password"><b>Password: </b></label>
             <input id="password" type="password" placeholder="Enter Password" name="password" required>
 
-            <button type="submit" value="Send">Enter</button>
+            <button type="submit" value="Send">Sign up</button>
 
             <p style="font-size: small;">GIF or JIF?</p>
         </form>

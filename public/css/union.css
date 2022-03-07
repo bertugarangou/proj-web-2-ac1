@@ -1,9 +1,12 @@
+*{
+    font-family: sans-serif, Arial, Calibri, Verdana !important;
+}
 
 body{
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 1.2vw;
+    font-size: 1.6vw;
 }
 form{
     display: flex;
@@ -19,4 +22,18 @@ button, input{
 .login-img{
     width: 20vw;
     height: auto;
+}
+#search{
+    width: 50vw;
+}
+#search-button{
+    color: white;
+    font-weight: bold;
+    margin-top: 1vw;
+    width: 20vw;
+    height: 2vw;
+    align-self: center;
+    background-color: cadetblue;
+    border-color: cadetblue;
+    border-radius: 5px;
 }

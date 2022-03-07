@@ -1,3 +1,13 @@
+<?php
+ob_start();
+?>
+<?php
+    if(false){ #mirar la cookie de login
+        header("Location: /login.php");
+        header("Header2: Session Expired / Not logged in" );
+        header("Header3: Redirecting to main page" );
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,12 +26,27 @@
     <body>
     <h1>The GIF CLUB</h1><br>
 
+    <form method="POST">
+        <label for="search">Search a topic: </label>
+        <input id="search" type="text" placeholder="Mems, FPI open up, urss, pokimon, doramion..." name="search">
+        <button id="search-button" type="submit" value="Send">Find it!</button>
+
+    </form>
+
     </body>
 </html>
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
 
 <?php
 
 $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
 
+?>
+<?php
+ob_end_flush();
 ?>
