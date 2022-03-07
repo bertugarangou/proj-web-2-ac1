@@ -29,12 +29,18 @@ ob_start();
         <form method="POST">
             <label for="search">Search a topic: </label>
             <input id="search" type="text" placeholder="Mems, FPI open up, urss, pokimon, doramion..." name="search">
-            <button id="search-button" type="submit" value="Send">Find it!</button>
+            <button id="search-button" type="submit" value="Send" onclick="search">Find it!</button>
             <br>
 
         </form>
+        <?php
+        if($_POST && isset($_POST['search'])){
+            searchGIF(implode($_POST));
+        }
+        ?>
+
         <form method="POST">
-            <input type="submit" name="logout" value="Logout" onclick="logout">
+            <input type="submit" name="logout" value=" Logout " onclick="logout">
 
         </form>
         <?php
@@ -63,6 +69,11 @@ $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
         header("Location: /login.php");
         header("Header2: Session Expired / Not logged in");
         header("Header3: Redirecting to main page");
+    }
+    function searchGIF(string $input):void{
+        echo 'Search for " ' . $input . ' ":';
+        #codi crida api
+        #s'ha de protegir una session de session hijacking?
     }
 ?>
 <?php
