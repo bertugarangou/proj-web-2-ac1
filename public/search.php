@@ -4,9 +4,7 @@ ob_start();
 <?php
     if(in_array('carquinyolisSession', $_COOKIE) == false){ #existeix la cookie
         if($_COOKIE['carquinyolisSession'] == null) { #està plena
-            header("Location: /login.php");
-            header("Header2: Session Expired / Not logged in");
-            header("Header3: Redirecting to main page");
+           redirectToLogin();
         }
     }
 ?>
@@ -26,15 +24,22 @@ ob_start();
         <link rel="icon" href="/media/logo.webp"></head>
 
     <body>
-    <h1>The GIF CLUB</h1><br>
+        <h1>The GIF CLUB</h1><br>
 
-    <form method="POST">
-        <label for="search">Search a topic: </label>
-        <input id="search" type="text" placeholder="Mems, FPI open up, urss, pokimon, doramion..." name="search">
-        <button id="search-button" type="submit" value="Send">Find it!</button>
+        <form method="POST">
+            <label for="search">Search a topic: </label>
+            <input id="search" type="text" placeholder="Mems, FPI open up, urss, pokimon, doramion..." name="search">
+            <button id="search-button" type="submit" value="Send">Find it!</button>
+            <br>
 
-    </form>
+        </form>
+        <form method="POST">
+            <input type="submit" name="logout" value="Logout" onclick="logout">
 
+        </form>
+        <?php
+            if($_POST && isset($_POST['logout'])) removeCookie();
+        ?>
     </body>
 </html>
 <script>
@@ -49,10 +54,16 @@ $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
 
 
-    function removeCookie(){
+    function removeCookie():void{
         setcookie("carquinyolisSession", null, time() - 3600);
-    }
+        redirectToLogin();
 
+    }
+    function redirectToLogin():void{
+        header("Location: /login.php");
+        header("Header2: Session Expired / Not logged in");
+        header("Header3: Redirecting to main page");
+    }
 ?>
 <?php
 ob_end_flush();
