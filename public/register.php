@@ -35,14 +35,14 @@ ob_start();
         </form>
         <?php
 
-        if(empty($_POST)){
-        }
-        else if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false){
-            echo 'Attention! Email must have a valid format.';
-        }else if(check_password($_POST['password']) == false){
-            echo 'Attention! Password must have at least 8 characters and contain numbers and letters';
-        }else{
-            do_register();
+        if(!empty($_POST)) {
+            if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
+                echo 'Attention! Email must have a valid format.';
+            } else if (check_password($_POST['password']) == false) {
+                echo 'Attention! Password must have at least 8 characters and contain numbers and letters';
+            } else {
+                do_register();
+            }
         }
 
         ?>
@@ -69,8 +69,6 @@ ob_start();
             return false;
         }
     }
-
-
 
     function do_register(){
 

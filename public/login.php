@@ -1,7 +1,6 @@
 <?php
 ob_start();
 
-
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -106,15 +105,21 @@ function do_login(){
     }
 
     #Si esta be, fem el redirect al search (custom redirect)
-    setcookie('carquinyolisSession', strval($res[2]), time() + 86400); #24h cookie
+    setcookie('cookiesessio', strval(1)); #24h cookie
 
+    session_start();
+    if(!isset($_SESSION['sessio'])) $_SESSION['sessio'] = 1;
+    else $_SESSION['sessio']++;
+    redirectToSearch();
+
+}
+
+function redirectToSearch(){
     header("Location: /search.php");
     header("Header2: Login successful" );
     header("Header3: Redirecting to main page" );
     exit();
-
 }
-
 
 
 ?>
@@ -125,4 +130,3 @@ function do_login(){
 <?php
 ob_end_flush();
 ?>
-
