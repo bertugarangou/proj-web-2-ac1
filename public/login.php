@@ -1,5 +1,7 @@
 <?php
 ob_start();
+
+
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -22,11 +24,11 @@ ob_start();
         <p>Please login here</p>
         <form method="POST">
             <label for="email"><b>Email: </b></label>
-            <input id="email" type="text" placeholder="Enter Email" name="email" required>
+            <input id="email" type="text" placeholder="Enter Email" name="email">
             <br>
             <br>
             <label for="password"><b>Password: </b></label>
-            <input id="password" type="password" placeholder="Enter Password" name="password" required>
+            <input id="password" type="password" placeholder="Enter Password" name="password">
 
             <button type="submit" value="Send">Login</button>
 
@@ -91,7 +93,7 @@ function do_login(){
     }
 
     #Si l'usuari existeix agafem la contra i la data per comprovar el login
-    $stat = $con->prepare('SELECT password, created_at FROM Users WHERE email=?');
+    $stat = $con->prepare('SELECT password, created_at, user_id FROM Users WHERE email=?');
     $stat->bindParam(1,$email,PDO::PARAM_STR);
     $stat->execute();
     $res = $stat->fetch();
@@ -104,7 +106,8 @@ function do_login(){
     }
 
     #Si esta be, fem el redirect al search (custom redirect)
-    #TODO: cookie/session
+    setcookie('carquinyolisSession', strval($res[2]), time() + 86400); #24h cookie
+
     header("Location: /search.php");
     header("Header2: Login successful" );
     header("Header3: Redirecting to main page" );

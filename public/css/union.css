@@ -32,6 +32,8 @@ button, input{
     margin-top: 1vw;
     width: 20vw;
     height: 2vw;
+    min-height: 20px !important;
+    min-width: 75px;
     align-self: center;
     background-color: cadetblue;
     border-color: cadetblue;

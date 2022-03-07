@@ -2,10 +2,12 @@
 ob_start();
 ?>
 <?php
-    if(false){ #mirar la cookie de login
-        header("Location: /login.php");
-        header("Header2: Session Expired / Not logged in" );
-        header("Header3: Redirecting to main page" );
+    if(in_array('carquinyolisSession', $_COOKIE) == false){ #existeix la cookie
+        if($_COOKIE['carquinyolisSession'] == null) { #està plena
+            header("Location: /login.php");
+            header("Header2: Session Expired / Not logged in");
+            header("Header3: Redirecting to main page");
+        }
     }
 ?>
 <!DOCTYPE html>
@@ -45,6 +47,11 @@ ob_start();
 
 $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
+
+
+    function removeCookie(){
+        setcookie("carquinyolisSession", null, time() - 3600);
+    }
 
 ?>
 <?php

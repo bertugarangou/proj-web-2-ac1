@@ -23,11 +23,11 @@ ob_start();
 
         <form method="POST">
             <label for="email"><b>Email: </b></label>
-            <input id="email" type="text" placeholder="Enter Email" name="email" required>
+            <input id="email" type="text" placeholder="Enter Email" name="email">
             <br>
             <br>
             <label for="password"><b>Password: </b></label>
-            <input id="password" type="password" placeholder="Enter Password" name="password" required>
+            <input id="password" type="password" placeholder="Enter Password" name="password">
 
             <button type="submit" value="Send">Sign up</button>
 
