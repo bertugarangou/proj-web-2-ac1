@@ -59,13 +59,13 @@ ob_start();
 
 <?php
 
-function check_password(string $passwd):bool{
-    if(strlen($passwd) >= 1){
-        return true;
-    }else {
-        return false;
+    function check_password(string $passwd):bool{
+        if(strlen($passwd) >= 1){
+            return true;
+        }else {
+            return false;
+        }
     }
-}
 
 
 
@@ -104,18 +104,16 @@ function do_login(){
         return;
     }
 
-    #Si esta be, fem el redirect al search (custom redirect)
-    setcookie('cookiesessio', strval(1)); #24h cookie
+    #TODO: re-redirigeix sempre del search al login
 
     session_start();
-    if(!isset($_SESSION['sessio'])) $_SESSION['sessio'] = 1;
-    else $_SESSION['sessio']++;
-    redirectToSearch();
+    $_SESSION['email'] = $email;
 
+    redirectToSearch();
 }
 
 function redirectToSearch(){
-    header("Location: /search.php");
+    header("Location: /search.php"); #TODO: 200 o custom?
     header("Header2: Login successful" );
     header("Header3: Redirecting to main page" );
     exit();
@@ -125,8 +123,6 @@ function redirectToSearch(){
 ?>
 
 
-
-
 <?php
-ob_end_flush();
+    ob_end_flush();
 ?>

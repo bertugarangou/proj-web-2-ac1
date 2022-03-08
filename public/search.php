@@ -1,11 +1,11 @@
 <?php
-ob_start();
 
-if(in_array('cookisessio', $_COOKIE) == false){ #no existeix la cookie
-    if($_COOKIE['cookiesessio'] == null) { #no està plena
-        redirectToLogin();
-    }
-}
+    require_once __DIR__ . '/vendor/autoload.php';
+    use GuzzleHttp\Client as Client;
+
+ob_start();
+session_start();
+    if(!isset($_SESSION['email'])) redirectToLogin();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,31 +21,30 @@ if(in_array('cookisessio', $_COOKIE) == false){ #no existeix la cookie
     <META name="keywords" content="GIF, AC1, PROJ-WEB-2">
 
     <link rel="icon" href="/media/logo.webp"></head>
+    <body>
+        <h1>The GIF CLUB</h1><br>
 
-<body>
-<h1>The GIF CLUB</h1><br>
+        <form method="POST">
+            <label for="search">Search a topic: </label>
+            <input id="search" type="text" placeholder="Mems, FBI open up, urss, pokimon, doramion..." name="search">
+            <button id="search-button" type="submit" value="Send" onclick="search">Find it!</button>
+            <br>
+        </form>
+        <?php
+            if($_POST && isset($_POST['search'])){
+                if(strlen(implode($_POST)) >= 1) {
+                    searchGIF(implode($_POST));
+                }
+            }
+        ?>
 
-<form method="POST">
-    <label for="search">Search a topic: </label>
-    <input id="search" type="text" placeholder="Mems, FBI open up, urss, pokimon, doramion..." name="search">
-    <button id="search-button" type="submit" value="Send" onclick="search">Find it!</button>
-    <br>
-
-</form>
-<?php
-if($_POST && isset($_POST['search'])){
-    searchGIF(implode($_POST));
-}
-?>
-
-<form method="POST">
-    <input type="submit" name="logout" value=" Logout " onclick="logout">
-
-</form>
-<?php
-if($_POST && isset($_POST['logout'])) removeCookie();
-?>
-</body>
+        <form method="POST">
+            <input type="submit" name="logout" value=" Logout " onclick="logout">
+        </form>
+        <?php
+            if($_POST && isset($_POST['logout'])) removeCookie();
+        ?>
+    </body>
 </html>
 <script>
     if ( window.history.replaceState ) {
@@ -55,16 +54,11 @@ if($_POST && isset($_POST['logout'])) removeCookie();
 
 <?php
 
-
-
-
-
 function removeCookie():void{
-    setcookie("cookiesessio", null, time() - 3600);
+    unset($_SESSION['email']);
+    session_destroy();
 
-    unset($_SESSION['sessio']);
     redirectToLogin();
-
 }
 function redirectToLogin():void{
     header("Location: /login.php");
@@ -76,28 +70,21 @@ function searchGIF(string $input):void{
     $sqlUser = 'root';
     $sqlPass = 'admin';
     $con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $sqlUser, $sqlPass);
-
     $stat = $con->prepare('INSERT INTO Search(query, timestamp) VALUES (?, now());');
     $stat->bindParam(1,$input,PDO::PARAM_STR);
     $stat->execute();
 
-
-/*
     $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
+
     #TODO: installar composer i guzle; composer s'ha de modificar el dockerfile, és segur?
     #TODO: codi crida api
-    #TODO: què passa amb la sessió oberta si anem del search al login i loguegem una altra o registrem una altra?
-    $client = new GuzzleHttp\Client(['base_uri' => 'api.giphy.com/v1/gifs/search?api_key='. $APIKey .'&q='.$input]);
-    $request = new Request('PUT', 'http://httpbin.org/put');
-    $response = $client->send($request, ['timeout' => 5]);
+
+    $client = new \GuzzleHttp\Client();
+    $response = $client->request('POST', 'api.giphy.com/v1/gifs/search?api_key='.$APIKey.'&q='.$input);
 
     var_dump($response);
-
-*/
-
-
 }
 ?>
 <?php
-ob_end_flush();
+    ob_end_flush();
 ?>
