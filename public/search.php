@@ -76,13 +76,20 @@ function searchGIF(string $input):void{
 
     $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
-    #TODO: installar composer i guzle; composer s'ha de modificar el dockerfile, és segur?
-    #TODO: codi crida api
 
-    $client = new \GuzzleHttp\Client();
-    $response = $client->request('POST', 'api.giphy.com/v1/gifs/search?api_key='.$APIKey.'&q='.$input);
+    try {
+        $client = new Client();
+        $config = array('query' => ['api_key' => $APIKey, 'q' => $input, 'limit' => 1, 'lang' => 'es'], 'verify' => false,);
+        $response = $client->request('GET', 'api.giphy.com/v1/gifs/search', $config);
+        $response2 = $response->getBody()->getContents();
+        $jsonArray = (json_decode($response2, true))['data'][0];
+        var_dump($jsonArray);
 
-    var_dump($response);
+
+
+    }catch (Exception $fail){
+        echo "Please try again. You may be disconnected from internet or your request was too long.";
+    }
 }
 ?>
 <?php
