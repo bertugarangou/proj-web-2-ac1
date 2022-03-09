@@ -1,11 +1,13 @@
 <?php
+    ob_start();
 
     require_once __DIR__ . '/vendor/autoload.php';
     use GuzzleHttp\Client as Client;
 
-ob_start();
-session_start();
+    session_start();
     if(!isset($_SESSION['email'])) redirectToLogin();
+
+    $showResults = false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +24,10 @@ session_start();
 
     <link rel="icon" href="/media/logo.webp"></head>
     <body>
-        <h1>The GIF CLUB</h1><br>
+    <?php
+        if(rand(0,1)) echo "<h1>The GIF CLUB</h1><br>";
+        else echo "<h1>The JIF CLUB</h1><br>";
+    ?>
 
         <form method="POST">
             <label for="search">Search a topic: </label>
@@ -30,13 +35,15 @@ session_start();
             <button id="search-button" type="submit" value="Send" onclick="search">Find it!</button>
             <br>
         </form>
+        <section class="gifSection">
         <?php
             if($_POST && isset($_POST['search'])){
                 if(strlen(implode($_POST)) >= 1) {
-                    searchGIF(implode($_POST));
+                    $jsonArray =  searchGIF(implode($_POST));
                 }
             }
         ?>
+        </section>
 
         <form method="POST">
             <input type="submit" name="logout" value=" Logout " onclick="logout">
@@ -44,6 +51,7 @@ session_start();
         <?php
             if($_POST && isset($_POST['logout'])) removeCookie();
         ?>
+
     </body>
 </html>
 <script>
@@ -57,7 +65,6 @@ session_start();
 function removeCookie():void{
     unset($_SESSION['email']);
     session_destroy();
-
     redirectToLogin();
 }
 function redirectToLogin():void{
@@ -66,7 +73,7 @@ function redirectToLogin():void{
     header("Header3: Redirecting to main page");
     exit();
 }
-function searchGIF(string $input):void{
+function searchGIF(string $input){
     $sqlUser = 'root';
     $sqlPass = 'admin';
     $con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $sqlUser, $sqlPass);
@@ -76,21 +83,38 @@ function searchGIF(string $input):void{
 
     $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
-
     try {
         $client = new Client();
-        $config = array('query' => ['api_key' => $APIKey, 'q' => $input, 'limit' => 1, 'lang' => 'es'], 'verify' => false,);
+        $config = array('query' => ['api_key' => $APIKey, 'q' => $input, 'limit' => 20, 'lang' => 'es'], 'verify' => false,);
         $response = $client->request('GET', 'api.giphy.com/v1/gifs/search', $config);
         $response2 = $response->getBody()->getContents();
-        $jsonArray = (json_decode($response2, true))['data'][0];
-        var_dump($jsonArray);
+        $jsonArray = (json_decode($response2, true))['data'];
+
+        $showResults = true;
+
+        if($showResults == true){
+
+            foreach($jsonArray as $packedGif){
+
+                echo "<div class=\"gif\"> ";
+                echo "<img class=\"gifImg\" src=\"".$packedGif['images']['fixed_width']['url']."\" alt=\"".$packedGif['title']."\" role=\"img\"> ";
+                if(strlen($packedGif['username']) > 0) echo "<p> By: ".$packedGif['username'] ."</p>";
+                else echo "<p class='gifUser'> Uploaded anonymously</p>";
+                echo "</div>";
+            }
+        }
 
 
+
+
+        return $jsonArray;
 
     }catch (Exception $fail){
         echo "Please try again. You may be disconnected from internet or your request was too long.";
+        return null;
     }
 }
+
 ?>
 <?php
     ob_end_flush();

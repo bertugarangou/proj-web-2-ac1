@@ -39,3 +39,14 @@ button, input{
     border-color: cadetblue;
     border-radius: 5px;
 }
+.gifSection{
+    display: flex;
+    flex-wrap: wrap;
+
+}
+.gifSection > div{
+    display: flex !important;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin: 2vw;
+}
