@@ -5,7 +5,7 @@
     use GuzzleHttp\Client as Client;
 
     session_start();
-    if(!isset($_SESSION['email'])) redirectToLogin();
+    if(!isset($_SESSION['user_id'])) redirectToLogin();
 
     $showResults = false;
 ?>
@@ -39,7 +39,7 @@
         <?php
             if($_POST && isset($_POST['search'])){
                 if(strlen(implode($_POST)) >= 1) {
-                    $jsonArray =  searchGIF(implode($_POST));
+                    searchGIF(implode($_POST));
                 }
             }
         ?>
@@ -63,7 +63,7 @@
 <?php
 
 function removeCookie():void{
-    unset($_SESSION['email']);
+    unset($_SESSION['user_id']);
     session_destroy();
     redirectToLogin();
 }
@@ -77,9 +77,38 @@ function searchGIF(string $input){
     $sqlUser = 'root';
     $sqlPass = 'admin';
     $con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $sqlUser, $sqlPass);
-    $stat = $con->prepare('INSERT INTO Search(query, timestamp) VALUES (?, now());');
+    $stat = $con->prepare('INSERT INTO Search(query, timestamp) VALUES (?, ?);');
     $stat->bindParam(1,$input,PDO::PARAM_STR);
+    $nowTimeLast = date('Y-m-d H:i:s');
+
+    $stat->bindParam(2,$nowTimeLast,PDO::PARAM_STR);
     $stat->execute();
+
+
+
+    #Agafar search_id
+    $stat2 = $con->prepare('SELECT search_id  FROM Search WHERE query=? AND timestamp=?');
+    $stat2->bindParam(1,$input, PDO::PARAM_STR);
+    $stat2->bindParam(2,$nowTimeLast, PDO::PARAM_STR);
+    $stat2->execute();
+    $res2 = $stat2->fetch();
+
+    # $res2 => search_id
+    # $_SESSION['user_id'] => user_id
+
+    #Enviar la relació UserSeach
+    $tmp = $res2['search_id'];
+    $stat = $con->prepare('INSERT INTO Search(query, timestamp) VALUES (?, ?);');
+    $stat->bindParam(1,$tmp,PDO::PARAM_STR);
+    $stat->bindParam(2,$_SESSION['user_id'],PDO::PARAM_STR);
+    $stat->execute();
+
+
+
+
+
+
+
 
     $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
@@ -104,10 +133,6 @@ function searchGIF(string $input){
             }
         }
 
-
-
-
-        return $jsonArray;
 
     }catch (Exception $fail){
         echo "Please try again. You may be disconnected from internet or your request was too long.";

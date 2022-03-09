@@ -107,7 +107,7 @@ function do_login(){
     #TODO: re-redirigeix sempre del search al login
 
     session_start();
-    $_SESSION['email'] = $email;
+    $_SESSION['user_id'] = $res[2];
 
     redirectToSearch();
 }
