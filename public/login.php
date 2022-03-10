@@ -38,9 +38,9 @@ ob_start();
         if(empty($_POST)){
         }
         else if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false){
-            echo 'Attention! You need to write an email. Ex: pingu@pingu.moc';
+            echo '<p class="errorMsg">Attention! You need to write an email. Ex: pingu@pingu.moc</p>';
         }else if(check_password($_POST['password']) == false){
-            echo 'Attention! You need to write a password.';
+            echo '<p class="errorMsg">Attention! You need to write a password.</p>';
         }else{
             do_login();
         }
@@ -87,7 +87,7 @@ function do_login(){
 
     #Si l'usuari no existeix; cancelar
     if(count($res) == 0){
-        echo 'Wrong email or password. Try again.';
+        echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
         return;
     }
 
@@ -100,7 +100,7 @@ function do_login(){
     $localHash = hash('sha512', ($res[1] . $hashPassword));
     #comparem hashs de les contres. Si esta malament cancelem
     if(strcmp($localHash, $res[0]) != 0){
-        echo 'Wrong email or password. Try again.';
+        echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
         return;
     }
 

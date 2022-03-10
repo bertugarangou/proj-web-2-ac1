@@ -126,7 +126,7 @@ function searchGIF(string $input){
 
 
     }catch (Exception $fail){
-        echo "Please try again. You may be disconnected from internet or your request was too long.";
+        echo '<p class="errorMsg">Please try again. You may be disconnected from internet or your request was too long.</p>';
         return null;
     }
 }

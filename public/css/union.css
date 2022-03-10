@@ -50,3 +50,7 @@ button, input{
     flex-wrap: wrap;
     margin: 2vw;
 }
+.errorMsg{
+    color: red;
+    text-wrap: normal;
+}

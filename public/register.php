@@ -1,5 +1,9 @@
 <?php
 ob_start();
+    use BbddUnifier as Bbdd;
+    $bbdd = new Bbdd();
+
+    $bbdd->emailExists();
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -37,9 +41,9 @@ ob_start();
 
         if(!empty($_POST)) {
             if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
-                echo 'Attention! Email must have a valid format.';
+                echo '<p class="errorMsg">Attention! Email must have a valid format.</p>';
             } else if (check_password($_POST['password']) == false) {
-                echo 'Attention! Password must have at least 8 characters and contain numbers and letters';
+                echo '<p class="errorMsg">Attention! Password must have at least 8 characters and contain numbers and letters</p>';
             } else {
                 do_register();
             }
@@ -86,7 +90,7 @@ ob_start();
 
         #Si ja existeix (array plena); cancelar
         if(!count($res) == 0){
-            echo 'Email already in use. Please login instead or use a new one.';
+            echo '<p class="errorMsg">Email already in use. Please login instead or use a new one.</p>';
             return;
         }
         #Si no existeix; registrar
