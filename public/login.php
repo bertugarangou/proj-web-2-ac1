@@ -110,7 +110,8 @@ function do_login(){
 }
 
 function redirectToSearch(){
-    header("Location: /search.php"); #TODO: 200 o custom?
+    header("HTTP 200 OK");
+    header("Location: /search.php");
     exit();
 }
 

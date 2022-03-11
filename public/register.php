@@ -97,6 +97,7 @@ use \BbddClass as BaseDades;
 
             $bbdd->registerUser($email, $salthash, $date);
             #http redirect al login
+            header("HTTP 200 OK");
             header("Location: /login.php");
             exit();
 

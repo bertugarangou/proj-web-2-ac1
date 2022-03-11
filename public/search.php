@@ -69,7 +69,9 @@ function removeCookie():void{
     redirectToLogin();
 }
 function redirectToLogin():void{
+    header("HTTP 301 Moved Permanently");
     header("Location: /login.php");
+
     exit();
 }
 function searchGIF(string $input){
@@ -82,7 +84,7 @@ function searchGIF(string $input){
         $bbdd->guardarSearch($input);
 
     }catch (Exception $e){
-        echo '<p class="errorMsg">Currently having problems for the registration service. Try again later.</p>';
+        echo '<p class="errorMsg">Currently having problems in the service. Try again later.</p>';
         return;
     }
 
@@ -94,8 +96,6 @@ function searchGIF(string $input){
         $response = $client->request('GET', 'api.giphy.com/v1/gifs/search', $config);
         $response2 = $response->getBody()->getContents();
         $jsonArray = (json_decode($response2, true))['data'];
-
-
 
             foreach($jsonArray as $packedGif){
 

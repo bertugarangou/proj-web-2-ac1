@@ -73,7 +73,8 @@ class BbddClass{
         }
     }
 
-    public function guardarSearch(string $input){
+    public function guardarSearch(string $input)
+    {
         #Enviar la Search
         $stat = $this->con->prepare('INSERT INTO Search(query, timestamp) VALUES (?, ?);');
         $stat->bindParam(1, $input, PDO::PARAM_STR);
@@ -96,7 +97,6 @@ class BbddClass{
         $stat->bindParam(2, $tmp, PDO::PARAM_STR);
         $stat->execute();
     }
-
 }
 
 
