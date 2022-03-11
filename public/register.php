@@ -1,9 +1,9 @@
 <?php
 ob_start();
-    use BbddUnifier as Bbdd;
-    $bbdd = new Bbdd();
 
-    $bbdd->emailExists();
+require_once('BbddClass.php');
+use \BbddClass as BaseDades;
+
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -62,8 +62,6 @@ ob_start();
     }
 </script>
 
-
-
 <?php
 
         function check_password(string $passwd):bool{
@@ -76,44 +74,38 @@ ob_start();
 
     function do_register(){
 
-        $email = $_POST['email'];
-        #Connectar amb la bbdd
-        $sqlUser = 'root';
-        $sqlPass = 'admin';
-        $con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $sqlUser, $sqlPass);
 
-        #Mirar si ja existeix un usuari amb aquest correu
-        $stat = $con->prepare('SELECT email FROM Users WHERE email=?');
-        $stat->bindParam(1,$email,PDO::PARAM_STR);
-        $stat->execute();
-        $res = $stat->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $email = $_POST['email'];
+            $bbdd = new BaseDades();
+            $bbdd->connect();
 
-        #Si ja existeix (array plena); cancelar
-        if(!count($res) == 0){
-            echo '<p class="errorMsg">Email already in use. Please login instead or use a new one.</p>';
-            return;
+
+            #Si ja existeix (array plena); cancelar
+
+            if($bbdd->emailExists($email) == true){
+                echo '<p class="errorMsg">Email already in use. Please login instead or use a new one.</p>';
+                return;
+            }
+            #Si no existeix; registrar
+            #Fem un hash de la contrassenya
+            $hashPassword = hash('sha512', $_POST['password'], false);
+            #Fem un SALT
+            $date = date('Y-m-d H:i:s');
+            $salthash = hash('sha512', ($date . $hashPassword));
+
+
+            $bbdd->registerUser($email, $salthash, $date);
+            #http redirect al login
+            header("Location: /login.php");
+            exit();
+
+        }catch (Exception $e){
+            # si la bbdd està desconnectada
+            echo '<p class="errorMsg">Currently having problems for the registration service. Try again later.</p>';
+
         }
-        #Si no existeix; registrar
-        #Fem un hash de la contrassenya
-        $hashPassword = hash('sha512', $_POST['password'], false);
-        #Fem un SALT
-        $date = date('Y-m-d H:i:s');
-        $salthash = hash('sha512', ($date . $hashPassword));
 
-        //Registrem l'usuari amb email, data utilitzada pel SALT i hash amb SALT
-        $stat = $con->prepare('INSERT INTO Users(email, password, created_at, updated_at) VALUES (?, ?, ?, ?);');
-        $stat->bindParam(1,$email,PDO::PARAM_STR);
-        $stat->bindParam(2,$salthash,PDO::PARAM_STR);
-        $stat->bindParam(3,$date,PDO::PARAM_STR); #pel salt s'hauria de no enviar la date i generar-la a la bbdd
-        $stat->bindParam(4,$date,PDO::PARAM_STR);
-        $stat->execute();
-
-        #http redirect al login
-        header("Location: /login.php");
-        header("Header2: Register successful" );
-        header("Header2: Redirecting to login page" );
-
-        exit();
 
     }
 

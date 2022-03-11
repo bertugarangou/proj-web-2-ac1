@@ -42,13 +42,14 @@ button, input{
 .gifSection{
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-around !important;
 
 }
 .gifSection > div{
     display: flex !important;
     flex-direction: column;
     flex-wrap: wrap;
-    margin: 2vw;
+    margin: 1.8vw;
 }
 .errorMsg{
     color: red;

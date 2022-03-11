@@ -7,7 +7,8 @@
     session_start();
     if(!isset($_SESSION['user_id'])) redirectToLogin();
 
-    $showResults = false;
+require_once('BbddClass.php');
+use \BbddClass as BaseDades;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,39 +70,23 @@ function removeCookie():void{
 }
 function redirectToLogin():void{
     header("Location: /login.php");
-    header("Header2: Session Expired / Not logged in");
-    header("Header3: Redirecting to main page");
     exit();
 }
 function searchGIF(string $input){
-    $sqlUser = 'root';
-    $sqlPass = 'admin';
-    $con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $sqlUser, $sqlPass);
 
-    #Enviar la Search
-    $stat = $con->prepare('INSERT INTO Search(query, timestamp) VALUES (?, ?);');
-    $stat->bindParam(1,$input,PDO::PARAM_STR);
-    $nowTimeLast = date('Y-m-d H:i:s');
-    $stat->bindParam(2,$nowTimeLast,PDO::PARAM_STR);
-    $stat->execute();
+    try {
 
-    #Agafar search_id
-    $stat2 = $con->prepare('SELECT LAST_INSERT_ID();');
-    $stat2->execute();
-    $res2 = $stat2->fetch();
+        $bbdd = new BaseDades();
+        $bbdd->connect();
 
-    # $res2 => search_id
-    # $_SESSION['user_id'] => user_id
+        $bbdd->guardarSearch($input);
 
-    #Enviar la relació UserSeach
-    $tmp = $res2['LAST_INSERT_ID()'];
-    $stat = $con->prepare('INSERT INTO UserSearch(user_id, search_id) VALUES (?, ?);');
-    $stat->bindParam(1,$_SESSION['user_id'],PDO::PARAM_STR);
-    $stat->bindParam(2,$tmp,PDO::PARAM_STR);
-    $stat->execute();
+    }catch (Exception $e){
+        echo '<p class="errorMsg">Currently having problems for the registration service. Try again later.</p>';
+        return;
+    }
 
-
-    $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
+     $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
     try {
         $client = new Client();
@@ -110,9 +95,7 @@ function searchGIF(string $input){
         $response2 = $response->getBody()->getContents();
         $jsonArray = (json_decode($response2, true))['data'];
 
-        $showResults = true;
 
-        if($showResults == true){
 
             foreach($jsonArray as $packedGif){
 
@@ -121,7 +104,7 @@ function searchGIF(string $input){
                 if(strlen($packedGif['username']) > 0) echo "<p> By: ".$packedGif['username'] ."</p>";
                 else echo "<p class='gifUser'> Uploaded anonymously</p>";
                 echo "</div>";
-            }
+
         }
 
 

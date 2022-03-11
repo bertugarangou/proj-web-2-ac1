@@ -1,8 +1,10 @@
 <?php
 ob_start();
 
+require_once('BbddClass.php');
+use \BbddClass as BaseDades;
 ?>
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
     <head>
@@ -70,52 +72,45 @@ ob_start();
 
 
 function do_login(){
-    #Fem el hash de la contra
-    $hashPassword = hash('sha512', $_POST['password'], false);
-    $email = $_POST['email'];
+    try {
 
-    #Connectem a la bbdd
-    $sqlUser = 'root';
-    $sqlPass = 'admin';
-    $con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $sqlUser, $sqlPass);
+        $bbdd = new BaseDades();
+        $bbdd->connect();
 
-    #Mirem si el correu existeix per no haver de mirar la contra amb nulls
-    $stat = $con->prepare('SELECT email FROM Users WHERE email=?');
-    $stat->bindParam(1,$email,PDO::PARAM_STR);
-    $stat->execute();
-    $res = $stat->fetchAll(PDO::FETCH_ASSOC);
+        #Fem el hash de la contra
+        $hashPassword = hash('sha512', $_POST['password'], false);
+        $email = $_POST['email'];
 
-    #Si l'usuari no existeix; cancelar
-    if(count($res) == 0){
-        echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
+        #Mirem si el correu existeix
+        if ($bbdd->emailExists($email) == false) {
+            echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
+            # millor no dir si la compta existeix o no
+            return;
+        }
+
+        #Si l'usuari existeix agafem la contra i la data per comprovar el login
+        $tmpID = $bbdd->checkPassowrd($email, $hashPassword);
+        if($tmpID == -1){#wrong password
+            echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
+            return;
+        }else if($tmpID == -2){
+            echo '<p class="errorMsg">Currently having problems on the login service. Try again later.</p>';
+        }
+
+        #TODO: re-redirigeix sempre del search al login
+
+        session_start();
+        $_SESSION['user_id'] = $tmpID;
+
+        redirectToSearch();
+    }catch (Exception $e){
+        echo '<p class="errorMsg">Currently having problems on the login service. Try again later.</p>';
         return;
     }
-
-    #Si l'usuari existeix agafem la contra i la data per comprovar el login
-    $stat = $con->prepare('SELECT password, created_at, user_id FROM Users WHERE email=?');
-    $stat->bindParam(1,$email,PDO::PARAM_STR);
-    $stat->execute();
-    $res = $stat->fetch();
-    #Fem el hash del salt
-    $localHash = hash('sha512', ($res[1] . $hashPassword));
-    #comparem hashs de les contres. Si esta malament cancelem
-    if(strcmp($localHash, $res[0]) != 0){
-        echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
-        return;
-    }
-
-    #TODO: re-redirigeix sempre del search al login
-
-    session_start();
-    $_SESSION['user_id'] = $res[2];
-
-    redirectToSearch();
 }
 
 function redirectToSearch(){
     header("Location: /search.php"); #TODO: 200 o custom?
-    header("Header2: Login successful" );
-    header("Header3: Redirecting to main page" );
     exit();
 }
 
