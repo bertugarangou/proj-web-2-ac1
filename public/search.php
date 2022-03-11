@@ -7,8 +7,10 @@
     session_start();
     if(!isset($_SESSION['user_id'])) redirectToLogin();
 
-require_once('BbddClass.php');
-use \BbddClass as BaseDades;
+    require_once('BbddClass.php');
+    use \BbddClass as BaseDades;
+    require_once ('GiphySearcher.php');
+    use \GiphySearcher as Giphy;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,14 +90,10 @@ function searchGIF(string $input){
         return;
     }
 
-     $APIKey = "R0OsrTT4b64wOXbRAazkISyqoXbzWdsc";
 
     try {
-        $client = new Client();
-        $config = array('query' => ['api_key' => $APIKey, 'q' => $input, 'limit' => 20, 'lang' => 'es'], 'verify' => false,);
-        $response = $client->request('GET', 'api.giphy.com/v1/gifs/search', $config);
-        $response2 = $response->getBody()->getContents();
-        $jsonArray = (json_decode($response2, true))['data'];
+            $giphy = new Giphy();
+            $jsonArray= $giphy->connect($input, 'es', 20);
 
             foreach($jsonArray as $packedGif){
 

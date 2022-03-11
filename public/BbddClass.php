@@ -3,16 +3,17 @@ class BbddClass{
     private $user = 'root';
     private $password  ='admin';
     private $con = null;
-
+    private $url = 'mysql:host=pw_local-db;dbname=TheGIFClub';
+    private $exceptionMsg = 'No connection to bbdd';
 
     /**
      * @throws Exception
      */
     public function connect(){
         try {
-            $this->con = new PDO('mysql:host=pw_local-db;dbname=TheGIFClub', $this->user, $this->password);
+            $this->con = new PDO($this->url, $this->user, $this->password);
         }catch (Exception $e){
-            throw new Exception('No connection to bbdd');
+            throw new Exception($this->exceptionMsg);
         }
     }
 
@@ -33,7 +34,7 @@ class BbddClass{
             }
             return true;
         }catch (Exception $e){
-            throw new Exception('No connection to bbdd');
+            throw new Exception($this->exceptionMsg);
         }
     }
 
@@ -51,7 +52,7 @@ class BbddClass{
         $stat->bindParam(4,$date,PDO::PARAM_STR);
         $stat->execute();
         }catch (Exception $e){
-            throw new Exception('No connection to bbdd');
+            throw new Exception($this->exceptionMsg);
         }
     }
 
@@ -98,6 +99,3 @@ class BbddClass{
         $stat->execute();
     }
 }
-
-
-?>
