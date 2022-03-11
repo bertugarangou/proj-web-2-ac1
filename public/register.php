@@ -3,6 +3,23 @@ ob_start();
 
 require_once('BbddClass.php');
     use \BbddClass as BaseDades;
+    $visibleEmail = 'hidden';
+    $visiblePasswd = 'hidden';
+?>
+<?php
+if(!empty($_POST)) {
+    if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
+        $visibleEmail = 'visible';
+
+    }
+    if (check_password($_POST['password']) == false) {
+        $visiblePasswd = 'visible';
+
+    }
+    if(strcmp($visiblePasswd, 'hidden') == 0 && strcmp($visibleEmail, 'hidden') == 0){
+        do_register();
+    }
+}
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -23,24 +40,16 @@ require_once('BbddClass.php');
         <form method="POST">
             <label for="email"><b>Email: </b></label>
             <input id="email" type="text" placeholder="Enter Email" name="email">
+            <p class="errorMsg" style="visibility: <?php echo $visibleEmail?>">Incorrect email format.</p>
+
             <br>
             <br>
             <label for="password"><b>Password: </b></label>
             <input id="password" type="password" placeholder="Enter Password" name="password">
+            <p class="errorMsg" style="visibility: <?php echo $visiblePasswd?>">Password needs a-A,0-9 and 8 chars minimum.</p>
             <button type="submit" value="Send">Sign up</button>
             <p style="font-size: small;">GIF or JIF?</p>
         </form>
-        <?php
-            if(!empty($_POST)) {
-                if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
-                    echo '<p class="errorMsg">Attention! Email must have a valid format.</p>';
-                } else if (check_password($_POST['password']) == false) {
-                    echo '<p class="errorMsg">Attention! Password must have at least 8 characters and contain numbers and letters</p>';
-                } else {
-                    do_register();
-                }
-            }
-        ?>
         <a href="./login.php"><img class="login-img" src="./media/register.jpg" alt="Already account image" role="presentation">
         </a>
     </body>

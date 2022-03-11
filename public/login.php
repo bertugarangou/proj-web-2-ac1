@@ -2,6 +2,24 @@
     ob_start();
     require_once('BbddClass.php');
     use \BbddClass as BaseDades;
+    $visibleEmail = 'hidden';
+    $visiblePasswd = 'hidden';
+
+?>
+    <?php
+    if(!empty($_POST)) {
+        if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
+            $visibleEmail = 'visible';
+
+        }
+        if (check_password($_POST['password']) == false) {
+            $visiblePasswd = 'visible';
+
+        }
+        if(strcmp($visiblePasswd, 'hidden') == 0 && strcmp($visibleEmail, 'hidden') == 0){
+            do_login();
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,24 +40,16 @@
         <form method="POST">
             <label for="email"><b>Email: </b></label>
             <input id="email" type="text" placeholder="Enter Email" name="email">
+            <p class="errorMsg" style="visibility: <?php echo $visibleEmail?>">Incorrect email format.</p>
             <br>
             <br>
             <label for="password"><b>Password: </b></label>
             <input id="password" type="password" placeholder="Enter Password" name="password">
+            <p class="errorMsg" style="visibility: <?php echo $visiblePasswd?>">Password needs a-A,0-9 and 8 chars minimum.</p>
             <button type="submit" value="Send">Login</button>
             <p style="font-size: small;">GIF or JIF?</p>
         </form>
-        <?php
-            if(empty($_POST)){
-            }
-            else if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false){
-                echo '<p class="errorMsg">Attention! You need to write an email. Ex: pingu@pingu.moc</p>';
-            }else if(check_password($_POST['password']) == false){
-                echo '<p class="errorMsg">Attention! You need to write a password.</p>';
-            }else{
-                do_login();
-            }
-        ?>
+
         <a href="./register.php"><img class="register-img" src="./media/no-account.jpg" alt="No account image" role="presentation">
         </a>
     </body>
@@ -51,7 +61,7 @@
 </script>
 <?php
     function check_password(string $passwd):bool{
-        if(strlen($passwd) >= 1){
+        if(strlen($passwd) >= 8 && preg_match('/[A-Za-z]/', $passwd) && preg_match('/[0-9]/', $passwd)){
             return true;
         }else {
             return false;
