@@ -60,29 +60,44 @@
     }
 </script>
 <?php
+/**
+ * Funció per eliminar la sessió de php
+ * @return void
+ */
 function removeCookie():void{
     unset($_SESSION['user_id']);
     session_destroy();
     redirectToLogin();
 }
+
+/**
+ * Funció que redirigeix al login
+ * @return void
+ */
 function redirectToLogin():void{
-    header("HTTP 301 Moved Permanently");
+    header("HTTP 302 Moved Temporarily");
     header("Location: /login.php");
     exit();
 }
+
+/**
+ * Funció que busca una paraula o contingut amb Guzzle a Giphy i mostra els gifs
+ * @param string $input paraula o contingut a buscar
+ * @return void|null
+ */
 function searchGIF(string $input){
-    try {
+    try {   #si no es pot connectar a la bbdd
         $bbdd = new BaseDades();
         $bbdd->connect();
-        $bbdd->guardarSearch($input);
+        $bbdd->guardarSearch($input);   #guardar la cerca a l'historial
     }catch (Exception $e){
         echo '<p class="errorMsg">Currently having problems in the service. Try again later.</p>';
         return;
     }
-    try {
+    try {   #si no es pot connectar a giphy/internet
         $giphy = new Giphy();
-        $jsonArray= $giphy->connect($input, 'es', 20);
-        foreach($jsonArray as $packedGif){
+        $jsonArray= $giphy->connect($input, 'es', 20); #obtenir els resultats
+        foreach($jsonArray as $packedGif){  #per cada gif trobat mostrar les dades i la imatge
             echo "<div class=\"gif\"> ";
             echo "<img class=\"gifImg\" src=\"".$packedGif['images']['fixed_width']['url']."\" alt=\"".$packedGif['title']."\" role=\"img\"> ";
             if(strlen($packedGif['username']) > 0) echo "<p> By: ".$packedGif['username'] ."</p>";

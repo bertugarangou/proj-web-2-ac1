@@ -1,13 +1,13 @@
 <?php
-ob_start();
+    ob_start();
 
-require_once('BbddClass.php');
+    require_once('BbddClass.php');
     use \BbddClass as BaseDades;
-    $visibleEmail = 'hidden';
+    $visibleEmail = 'hidden';   #vars per fer toogle als errors
     $visiblePasswd = 'hidden';
 ?>
 <?php
-if(!empty($_POST)) {
+if(!empty($_POST)) { #comprovar si l'email i la contra tenen formats vàlids. Es mira i es fa toogle
     if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
         $visibleEmail = 'visible';
 
@@ -17,7 +17,7 @@ if(!empty($_POST)) {
 
     }
     if(strcmp($visiblePasswd, 'hidden') == 0 && strcmp($visibleEmail, 'hidden') == 0){
-        do_register();
+        do_register();  #fer el registre si són correctes
     }
 }
 ?>
@@ -46,7 +46,7 @@ if(!empty($_POST)) {
             <br>
             <label for="password"><b>Password: </b></label>
             <input id="password" type="password" placeholder="Enter Password" name="password">
-            <p class="errorMsg" style="visibility: <?php echo $visiblePasswd?>">Password needs a-A,0-9 and 8 chars minimum.</p>
+            <p class="errorMsg" style="visibility: <?php echo $visiblePasswd?>">At least one letter and number and 8 characters long. No common passwords.</p>
             <button type="submit" value="Send">Sign up</button>
             <p style="font-size: small;">GIF or JIF?</p>
         </form>
@@ -60,18 +60,45 @@ if(!empty($_POST)) {
     }
 </script>
 <?php
+/**
+ * Funció que mira si la contrasenya té els requeriments vàlids
+ * @param string $passwd contrasenya a inspeccionar
+ * @return bool
+ */
     function check_password(string $passwd):bool{
-        if(strlen($passwd) >= 8 && preg_match('/[A-Za-z]/', $passwd) && preg_match('/[0-9]/', $passwd)){
-            return true;
+        if(strlen($passwd) >= 8 && preg_match('/[A-Za-z]/', $passwd) && preg_match('/[0-9]/', $passwd) && password_check_similar($passwd) == false){
+            return true; #es mira aA09 i 8 chars
         }else {
             return false;
         }
     }
+
+/**
+ * Funció que compara la contrasenya amb possibles similituds de contrasenyes fàcils d'endevina
+ * Hauria de comprovar d'una llista moolt més gran totes les possibles paraules comunes
+ * @param string $password Contrasenya a inspeccionar
+ * @return bool true: permesa
+ *              false: no permesa
+ */
+    function password_check_similar(string $password):bool{
+        $similarPasswd = ['abcd1234', '1234abcd', '12345678a', 'abcdefg1', 'password1234', 'letmein1']; #contrassenyes facils no permeses (uns pocs exemples)
+        foreach ($similarPasswd as $mostra){
+            if(strcmp($password,$mostra) == 0){
+                return true;
+            }
+        }
+
+        return false;
+    }
+/**
+ * Funció que fa el registr de l'usuari
+ * @return void
+ */
     function do_register(){
         try {
             $email = $_POST['email'];
             $bbdd = new BaseDades();
-            $bbdd->connect();
+            $bbdd->connect();   #connexió a la bbdd
             #Si ja existeix (array plena); cancelar
             if($bbdd->emailExists($email) == true){
                 echo '<p class="errorMsg">Email already in use. Please login instead or use a new one.</p>';
@@ -82,8 +109,8 @@ if(!empty($_POST)) {
             $hashPassword = hash('sha512', $_POST['password'], false);
             #Fem un SALT
             $date = date('Y-m-d H:i:s');
-            $salthash = hash('sha512', ($date . $hashPassword));
-            $bbdd->registerUser($email, $salthash, $date);
+            $salthash = hash('sha512', ($date . $hashPassword));    #per no tenir dos hashs iguals en dos bbdd diferents
+            $bbdd->registerUser($email, $salthash, $date);  #es registra l'usuari correcte
             #http redirect al login
             header("HTTP 200 OK");
             header("Location: /login.php");

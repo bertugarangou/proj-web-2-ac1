@@ -2,12 +2,13 @@
     ob_start();
     require_once('BbddClass.php');
     use \BbddClass as BaseDades;
-    $visibleEmail = 'hidden';
+    $visibleEmail = 'hidden';   #toggles per mostrar els errors
     $visiblePasswd = 'hidden';
 
 ?>
     <?php
-    if(!empty($_POST)) {
+    if(!empty($_POST)) {    #comprovar els errors de l'email i psswd. Innecessari pel login si ja ho mira a la bbdd però
+        # ho demana l'enunciat
         if (filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) == false) {
             $visibleEmail = 'visible';
 
@@ -17,7 +18,7 @@
 
         }
         if(strcmp($visiblePasswd, 'hidden') == 0 && strcmp($visibleEmail, 'hidden') == 0){
-            do_login();
+            do_login(); #si són correctes fer el login
         }
     }
 ?>
@@ -60,6 +61,12 @@
     }
 </script>
 <?php
+    /**
+     * Funció que comprova si la contrasenya té els requisits mínims
+     * @param string $passwd contrasenya a comprovar
+     * @return bool true si és correcte
+     *              false si conté errors
+     */
     function check_password(string $passwd):bool{
         if(strlen($passwd) >= 8 && preg_match('/[A-Za-z]/', $passwd) && preg_match('/[0-9]/', $passwd)){
             return true;
@@ -68,34 +75,39 @@
         }
     }
 function do_login(){
-    try {
+    try {   #Assegurar que la bbdd és accessible
         $bbdd = new BaseDades();
-        $bbdd->connect();
+        $bbdd->connect();   #establir connexió
         #Fem el hash de la contra
-        $hashPassword = hash('sha512', $_POST['password'], false);
+        $hashPassword = hash('sha512', $_POST['password'], false);  #es fa un hash de la contra
         $email = $_POST['email'];
         #Mirem si el correu existeix
         if ($bbdd->emailExists($email) == false) {
             echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
             # millor no dir si la compta existeix o no
-            return;
+            return; #si no existeix no es fa el login
         }
         #Si l'usuari existeix agafem la contra i la data per comprovar el login
-        $tmpID = $bbdd->checkPassowrd($email, $hashPassword);
+        $tmpID = $bbdd->checkPassowrd($email, $hashPassword);   #comprovem que la contra és correcte
         if($tmpID == -1){#wrong password
             echo '<p class="errorMsg">Wrong email or password. Try again.</p>';
-            return;
-        }else if($tmpID == -2){
+            return; #contrasenya incorrecte
+        }else if($tmpID == -2){ #problemes generals a la bbdd
             echo '<p class="errorMsg">Currently having problems on the login service. Try again later.</p>';
         }
-        session_start();
-        $_SESSION['user_id'] = $tmpID;
-        redirectToSearch();
+        session_start();    #iniciar sessió php
+        $_SESSION['user_id'] = $tmpID;  #aprofitem i enviem l'ID als altres fitxers amb la sessió
+        redirectToSearch(); #enviem l'usuari al login
     }catch (Exception $e){
         echo '<p class="errorMsg">Currently having problems on the login service. Try again later.</p>';
-        return;
+        return; #si no pot accedir a la bbdd
     }
 }
+
+/**
+ * Funció que redirigeix a la pàgina del search
+ * @return void
+ */
 function redirectToSearch(){
     header("HTTP 200 OK");
     header("Location: /search.php");
